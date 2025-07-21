@@ -1,141 +1,76 @@
 #include <stdio.h>
-#include <stdlib.h>
-
-#define MAX 100
-
-
-struct Sparse {
-    int row, col, value;
-    int size; 
-};
-
-
-void inputSparseMatrix(struct Sparse *s, int rows, int cols) {
-    int i, k = 0;
-    printf("Enter number of non-zero elements: ");
-    scanf("%d", &s->size);
-    
-    printf("Enter row, column, and value for each non-zero element:\n");
-    for (i = 0; i < s->size; i++) {
-        printf("Element %d (row col value): ", i + 1);
-        scanf("%d %d %d", &s->row, &s->col, &s->value);
-        
-        if (s->row >= rows || s->col >= cols) {
-            printf("Invalid row or column index!\n");
-            i--;
-        }
-    }
-}
-
-
-struct Sparse addSparseMatrix(struct Sparse *s1, struct Sparse *s2, struct Sparse *result) {
-    int i = 0, j = 0, k = 0;
-    
-    
-    if (s1->row != s2->row || s1->col != s2->col) {
-        printf("Matrices cannot be added due to incompatible dimensions!\n");
-        result->size = 0;
-        return *result;
-    }
-    
-    
-    while (i < s1->size && j < s2->size) {
-        if (k >= MAX) {
-            printf("Result matrix overflow!\n");
-            result->size = k;
-            return *result;
-        }
-        
-        if (s1->row < s2->row || (s1->row == s2->row && s1->col < s2->col)) {
-            result[k].row = s1[i].row;
-            result[k].col = s1[i].col;
-            result[k].value = s1[i].value;
-            i++;
-        } else if (s1->row > s2->row || (s1->row == s2->row && s1->col > s2->col)) {
-            result[k].row = s2[j].row;
-            result[k].col = s2[j].col;
-            result[k].value = s2[j].value;
-            j++;
-        } else {
-            int sum = s1[i].value + s2[j].value;
-            if (sum != 0) {
-                result[k].row = s1[i].row;
-                result[k].col = s1[i].col;
-                result[k].value = sum;
-                k++;
-            }
-            i++;
-            j++;
-        }
-    }
-    
-    
-    while (i < s1->size && k < MAX) {
-        result[k].row = s1[i].row;
-        result[k].col = s1[i].col;
-        result[k].value = s1[i].value;
-        i++;
-        k++;
-    }
-    
-    
-    while (j < s2->size && k < MAX) {
-        result[k].row = s2[j].row;
-        result[k].col = s2[j].col;
-        result[k].value = s2[j].value;
-        j++;
-        k++;
-    }
-    
-    result->size = k;
-    return *result;
-}
-
-
-struct Sparse transposeSparseMatrix(struct Sparse *s, struct Sparse *result) {
-    int i;
-    result->size = s->size;
-    for (i = 0; i < s->size; i++) {
-        result[i].row = s[i].col;
-        result[i].col = s[i].row;
-        result[i].value = s[i].value;
-    }
-    return *result;
-}
-
-
-void displaySparseMatrix(struct Sparse *s) {
-    printf("Sparse Matrix (row, col, value):\n");
-    for (int i = 0; i < s->size; i++) {
-        printf("%d %d %d\n", s[i].row, s[i].col, s[i].value);
-    }
-}
 
 int main() {
-    struct Sparse s1[MAX], s2[MAX], sum[MAX], transpose[MAX];
-    int rows, cols;
-    
-   
-    printf("Enter number of rows and columns for matrices: ");
-    scanf("%d %d", &rows, &cols);
-    
-    
-    printf("\nFor first sparse matrix:\n");
-    inputSparseMatrix(s1, rows, cols);
-    
-    
-    printf("\nFor second sparse matrix:\n");
-    inputSparseMatrix(s2, rows, cols);
-    
-    
-    printf("\nSum of sparse matrices:\n");
-    addSparseMatrix(s1, s2, sum);
-    displaySparseMatrix(sum);
-    
-    
-    printf("\nTranspose of sum matrix:\n");
-    transposeSparseMatrix(sum, transpose);
-    displaySparseMatrix(transpose);
-    
+    int r1, c1, n1,r2, c2, n2,i;
+    printf("Enter rows, columns and number of non-zero elements of Matrix 1: ");
+    scanf("%d %d %d", &r1, &c1, &n1);
+    int mat1[3][100];
+    printf("Enter the elements (row column value) of Matrix 1:\n");
+    for(i = 0; i < n1; i++) {
+        scanf("%d %d %d", &mat1[0][i], &mat1[1][i], &mat1[2][i]);
+    }
+    printf("Enter rows, columns and number of non-zero elements of Matrix 2: ");
+    scanf("%d %d %d", &r2, &c2, &n2);
+    int mat2[3][100];
+    printf("Enter the elements (row column value) of Matrix 2:\n");
+    for(i = 0; i < n2; i++) {
+        scanf("%d %d %d", &mat2[0][i], &mat2[1][i], &mat2[2][i]);
+    }
+    if (r1 != r2 || c1 != c2) {
+        printf("Error: Matrices dimensions do not match for addition.\n");
+        return 1;
+    }
+    printf("\nSparse Matrix 1 (row column value):\n");
+    for(i = 0; i < n1; i++) {
+        printf("%d %d %d\n", mat1[0][i], mat1[1][i], mat1[2][i]);
+    }
+    printf("\nSparse Matrix 2 (row column value):\n");
+    for(i = 0; i < n2; i++) {
+        printf("%d %d %d\n", mat2[0][i], mat2[1][i], mat2[2][i]);
+    }
+    int res[3][200];
+    int i1 = 0, i2 = 0, k = 0;
+    while(i1 < n1 && i2 < n2) {
+        int r1_pos = mat1[0][i1];
+        int c1_pos = mat1[1][i1];
+        int r2_pos = mat2[0][i2];
+        int c2_pos = mat2[1][i2];
+        if (r1_pos < r2_pos || (r1_pos == r2_pos && c1_pos < c2_pos)) {
+            res[0][k] = r1_pos;
+            res[1][k] = c1_pos;
+            res[2][k] = mat1[2][i1];
+            i1++; k++;
+        } else if (r2_pos < r1_pos || (r2_pos == r1_pos && c2_pos < c1_pos)) {
+            res[0][k] = r2_pos;
+            res[1][k] = c2_pos;
+            res[2][k] = mat2[2][i2];
+            i2++; k++;
+        } else {
+            int summed = mat1[2][i1] + mat2[2][i2];
+            if (summed != 0) { 
+                res[0][k] = r1_pos;
+                res[1][k] = c1_pos;
+                res[2][k] = summed;
+                k++;
+            }
+            i1++; i2++;
+        }
+    }
+    while(i1 < n1) {
+        res[0][k] = mat1[0][i1];
+        res[1][k] = mat1[1][i1];
+        res[2][k] = mat1[2][i1];
+        i1++; k++;
+    }
+    while(i2 < n2) {
+        res[0][k] = mat2[0][i2];
+        res[1][k] = mat2[1][i2];
+        res[2][k] = mat2[2][i2];
+        i2++; k++;
+    }
+    printf("\nSum of Sparse Matrices (row column value):\n");
+    for(i = 0; i < k; i++) {
+        printf("%d %d %d\n", res[0][i], res[1][i], res[2][i]);
+    }
     return 0;
 }
